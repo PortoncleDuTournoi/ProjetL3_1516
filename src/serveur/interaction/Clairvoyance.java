@@ -13,8 +13,6 @@ public class Clairvoyance extends Interaction<VuePersonnage>{
 	}
 
 	public HashMap<Caracteristique,Integer> clair(){
-		//Personnage att = attaquant.getElement();
-		//Personnage def = defenseur.getElement();
 		return defenseur.getElement().getCaracts();
 		
 	}
