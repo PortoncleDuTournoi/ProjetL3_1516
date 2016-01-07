@@ -24,6 +24,9 @@ public class StrategiePersonnage {
 	 */
 	protected Console console;
 	
+	// Contient le resultat de la clairvoyance
+	protected HashMap<Caracteristique, Integer> statClair = new HashMap<Caracteristique, Integer>();
+	
 	protected StrategiePersonnage(LoggerProjet logger){
 		logger.info("Lanceur", "Creation de la console...");
 	}
@@ -84,32 +87,55 @@ public class StrategiePersonnage {
 		
 		
 		
-		
-		
 		/********************************
 		 * 	 							*
 		 *   STRATEGIE DU PERSONNAGE	*
 		 *   							*
 		 ********************************/
-		
+		/* Strategie 
+	 * 
+	 * ALGO NON A JOUR
+	 * 
+	 * 
+	 *  si potion plus proche
+	 *  	si potion aporte bonus
+	 *  		aller vers elle
+	 *  		ramasser
+	 * 
+	 *  Sinon ennemi plus proche
+	 *  	clairvoyance
+	 *  	si peut se faire defoncer
+	 *  		si potion teleportation en vision
+	 *  			aller vers potion de teleportation
+	 *  	
+	 *  
+	 *  */
 		if (voisins.isEmpty()) { // je n'ai pas de voisins, j'erre
-			console.setPhrase("J'erre...");
-			arene.deplace(refRMI, 0); 
+			// si ma vie <60 ,  heal
+			if(this.console.getPersonnage().getCaract(Caracteristique.VIE) < 60) arene.lanceAutoSoin(refRMI);
 			
-		} else {
+			// sinon j'erre
+			else{ 
+				console.setPhrase("J'erre...");
+				arene.deplace(refRMI, 0); 
+			}
+		} 
+		
+		else {
 			int refCible = Calculs.chercheElementProche(position, voisins);
 			int distPlusProche = Calculs.distanceChebyshev(position, arene.getPosition(refCible));
 
 			String elemPlusProche = arene.nomFromRef(refCible);
-
+			
 			if(distPlusProche <= Constantes.DISTANCE_MIN_INTERACTION) { // si suffisamment proches
-				// j'interagis directement
+				
 				if(arene.estPotionFromRef(refCible)){ // potion
-					// ramassage
+					// ramassage si ça vaut le coup
+					// si tp : ramassage que si dans la merde
+					
 					console.setPhrase("Je ramasse une potion");
-
 					arene.ramassePotion(refRMI, refCible);			
-				} else { // personnage
+				} else { // personnage ou monstre
 					// duel
 					console.setPhrase("Je fais un duel avec " + elemPlusProche);
 					arene.lanceAttaque(refRMI, refCible);
@@ -117,14 +143,50 @@ public class StrategiePersonnage {
 				}
 				
 			} else { // si voisins, mais plus eloignes
-				// je vais vers le plus proche
-				console.setPhrase("Je vais vers mon voisin " + elemPlusProche);
-				arene.deplace(refRMI, refCible);
-				arene.lanceAttaque(refRMI, refCible);
+				
+				if(arene.estPotionFromRef(refCible)){ // Potion a distance
+					// Anduril : regarder si ça vaut le coup d'aller la prendre
+					// Diablo Potion :
+						// si ennemi dans champ vision
+							// clairvoyance
+							// si on va se faire defoncer
+								// aller vers potion
+							// sinon
+								// aller vers personnage
+				}
+				else if(arene.estMonstreFromRef(refCible)){
+					// si force > celle du monstre
+					if(this.console.getPersonnage().getCaract(Caracteristique.FORCE) >= 10){
+						console.setPhrase("Je vais vers mon voisin " + elemPlusProche);
+						arene.deplace(refRMI, refCible);
+						arene.lanceAttaque(refRMI, refCible);
+					}
+					else{
+						console.setPhrase("Je fuis comme un homosexuel...");
+						arene.deplace(refRMI, 0); 
+					}
+				}
+				
+				else{ // personnage
+					// clairvoyance
+					
+					
+					// si plus badass que nous, fuir
+					/*if(1){
+						console.setPhrase("Je fuis comme un homosexuel...");
+						arene.deplace(refRMI, 0); 
+					}*/
+					
+					/*else{*/
+						console.setPhrase("Je vais vers mon voisin " + elemPlusProche);
+						arene.deplace(refRMI, refCible);
+						arene.lanceAttaque(refRMI, refCible);
+					//}
+				}
 			}
 		}
 	}
-
+	
 	/********************************************
 	 * 											*
 	 *	 LISTE DES DIFFERENTES STRATEGIES		*
@@ -135,12 +197,9 @@ public class StrategiePersonnage {
 	 * 											*
 	 ********************************************/
 	
+	
 	/* Strategie de base
-	   if (voisins.isEmpty()) { // je n'ai pas de voisins, j'erre
-			console.setPhrase("J'erre...");
-			arene.deplace(refRMI, 0); 
-			
-		} else {
+	  else {
 			int refCible = Calculs.chercheElementProche(position, voisins);
 			int distPlusProche = Calculs.distanceChebyshev(position, arene.getPosition(refCible));
 
