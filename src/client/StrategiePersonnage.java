@@ -162,7 +162,7 @@ public class StrategiePersonnage {
 						if(this.nbEnnemis(voisins, arene) > 1)
 						{
 							console.setPhrase("Je ramasse une potion");
-							arene.ramassePotion(refRMI, refCible)
+							arene.ramassePotion(refRMI, refCible);
 						}
 						else
 						{
