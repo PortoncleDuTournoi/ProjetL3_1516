@@ -112,7 +112,11 @@ public class StrategiePersonnage {
 	 *  	
 	 *  
 	 *  */
-		if (voisins.isEmpty()) { // je n'ai pas de voisins, j'erre
+		
+		
+		
+		/* Je n'ai pas de voisin, j'erre */
+		if (voisins.isEmpty()) { 
 			// si ma vie <60 ,  heal
 			if(this.console.getPersonnage().getCaract(Caracteristique.VIE) < 60) 
 				arene.lanceAutoSoin(refRMI);
@@ -124,18 +128,21 @@ public class StrategiePersonnage {
 			}
 		} 
 		
+		/* Je vois des choses */
 		else {
 			int refCible = Calculs.chercheElementProche(position, voisins);
 			int distPlusProche = Calculs.distanceChebyshev(position, arene.getPosition(refCible));
 
 			String elemPlusProche = arene.nomFromRef(refCible);
 			
-			if(distPlusProche <= Constantes.DISTANCE_MIN_INTERACTION) { // si suffisamment proches
+			/* Si une élément est suffisamment proche */
+			if(distPlusProche <= Constantes.DISTANCE_MIN_INTERACTION) { 
 				
-				if(arene.estPotionFromRef(refCible)){ // potion
+				/* Si l'élément est une POTION */
+				if(arene.estPotionFromRef(refCible)){ 
 					// Anduril
 					if(elemPlusProche.equals("Anduril")){
-						 // regarder si �a vaut le coup d'aller la prendre
+						 // regarder si �a vaut le coup d'aller la prendre
 						if(goodPotion(arene, refCible)){
 							console.setPhrase("Je ramasse une potion");
 							arene.ramassePotion(refRMI, refCible);
@@ -149,39 +156,56 @@ public class StrategiePersonnage {
 					// Diablo
 					
 					
-					
-				} else { // personnage ou monstre
+				/* Si l'élément est un être vivant */
+				} else {
 					// duel
 					console.setPhrase("Je fais un duel avec " + elemPlusProche);
 					arene.lanceAttaque(refRMI, refCible);
 					arene.deplace(refRMI, refCible);
 				}
 				
-			} else { // si voisins, mais plus eloignes
+			/* Si l'élément est trop éloigné */
+			} else { 
 				
-				if(arene.estPotionFromRef(refCible)){ // Potion a distance
-					// Anduril
+				/* L'élément est une POTION */
+				if(arene.estPotionFromRef(refCible)){
+					
+					/* ANDURIL */
 					if(elemPlusProche.equals("Anduril")){
-						 // Si la potion est une bonne potion, la prendre
+						 /* Si bonne potion, déplacer */
 						if(goodPotion(arene, refCible)){
-							console.setPhrase("Je ramasse une potion");
-							arene.ramassePotion(refRMI, refCible);
+							console.setPhrase("Je vais vers une potion");
+							arene.deplace(refRMI, refCible);
 						}
-						// sinon errer
+						/* Errer sinon */
 						else{
 							console.setPhrase("J'erre...");
 							arene.deplace(refRMI, 0);
 						}
 					}
-					// Diablo
-					else{ 
-						// si ennemi dans champ vision
-							// clairvoyance
-							// si on va se faire defoncer
-								// aller vers potion
-							// sinon
-								// aller vers personnage
-						// sinon errer
+					
+					/* DIABLO */
+					else{
+						/* Si plus d'un ennemi est a proximité */
+						if(this.nbEnnemis(voisins, arene) > 1)
+						{
+							console.setPhrase("Je vais vers une potion");
+							arene.deplace(refRMI, refCible);
+						}
+						else
+						{
+							/* S'il y a un ennemi */
+							if(this.ennemiPlusProche(voisins, arene) != -1)
+							{
+								/* Intervention de Sylvain */
+							}
+							/* Sinon on erre, en priant pour rester pas loin de la potion */
+							else
+							{
+								console.setPhrase("J'erre...");
+								arene.deplace(refRMI, 0);
+							}
+						}
 					}
 					
 					
@@ -283,8 +307,37 @@ public class StrategiePersonnage {
 		}else nonAbsolu = true;
 		
 		
-		if(nonAbsolu == true || fav < 2) return false;
+		if(nonAbsolu == true || fav < 3) return false;
 		else return true;
+	}
+	
+	/* Renvoie le nombre d'ennemis en vue */
+	public int nbEnnemis(HashMap<Integer, Point> voisins, IArene arene) throws RemoteException
+	{
+		int nbEnnemis = 0;
+		for(Integer refVoisin : voisins.keySet())
+		{
+			if(arene.estPersonnageFromRef(refVoisin))
+			{
+				nbEnnemis++;
+			}
+		}
+		
+		return nbEnnemis;
+	}
+	
+	
+	/* Renvoie l'ennemi le plus proche S'IL N'Y A QU'UN SEUL ENNEMI EN VU !!! */
+	public int ennemiPlusProche(HashMap<Integer, Point> voisins, IArene arene) throws RemoteException
+	{
+		for(Integer refEnnemi : voisins.keySet())
+		{
+			if(arene.estPersonnageFromRef(refEnnemi))
+			{
+				return refEnnemi;
+			}
+		}
+		return -1;
 	}
 	
 }
