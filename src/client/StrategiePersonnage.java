@@ -29,6 +29,8 @@ public class StrategiePersonnage {
 	
 	int refClair;
 	
+	boolean attacAdv;
+	
 	protected StrategiePersonnage(LoggerProjet logger){
 		logger.info("Lanceur", "Creation de la console...");
 	}
@@ -142,8 +144,8 @@ public class StrategiePersonnage {
 					if(elemPlusProche.equals("Anduril")){
 						 // regarder si �a vaut le coup d'aller la prendre
 						if(goodPotion(arene, refCible)){
-							console.setPhrase("Je ramasse une potion");
-							arene.ramassePotion(refRMI, refCible);
+							console.setPhrase("Je vais vers une potion");
+							arene.deplace(refRMI, refCible);
 						}
 						// sinon errer
 						else{
@@ -203,9 +205,10 @@ public class StrategiePersonnage {
 					if(refCible != refClair){
 						statClair = arene.lanceClairvoyance(refRMI, refCible);
 						refClair = refCible;
+						attacAdv = this.gagnable(statClair);
 					}	
 					// si plus badass que nous, fuir
-					if(!this.gagnable(statClair)){
+					if(!attacAdv){
 						console.setPhrase("Je fuis comme un homosexuel...");
 						arene.deplace(refRMI, 0); 
 					}else{
@@ -225,17 +228,24 @@ public class StrategiePersonnage {
 		
 		while(!fin){
 			if((this.console.getPersonnage().getCaract(Caracteristique.VIE) - (caractAdv.get(Caracteristique.FORCE)*t)) <= 0){
-				if(this.console.getPersonnage().getCaract(Caracteristique.INITIATIVE)< caractAdv.get(Caracteristique.INITIATIVE)){
+				if(this.console.getPersonnage().getCaract(Caracteristique.INITIATIVE) < caractAdv.get(Caracteristique.INITIATIVE)){
 					gagne = false;
 					fin = true;
+					System.out.println(caractAdv);
+					System.out.println(console.getPersonnage());
+					System.out.println();
+					System.out.println("Il tape en premeier et nous tue!");
 				}else if((caractAdv.get(Caracteristique.VIE) - (this.console.getPersonnage().getCaract(Caracteristique.FORCE)*t)) <= 0){
 					fin = true;
+					System.out.println("Il peut nous tuer mais on le tue avant!");
 				}else{
 					gagne = false;
 					fin = true;
+					System.out.println("On tape en premier mais il nous defonce apres");
 				}
 			}else if((caractAdv.get(Caracteristique.VIE) - (this.console.getPersonnage().getCaract(Caracteristique.FORCE)*t)) <= 0){
 				fin = true;
+				System.out.println("On le defonce");
 			}
 			t++;
 		}
@@ -310,7 +320,7 @@ public class StrategiePersonnage {
 		}else nonAbsolu = true;
 		
 		
-		if(nonAbsolu == true || fav < 2) return false;
+		if(nonAbsolu == true || fav < 3) return false;
 		else return true;
 	}
 	
