@@ -23,6 +23,7 @@ public class StrategiePersonnage {
 	 * (l'arene).
 	 */
 	protected Console console;
+	protected HashMap<Caracteristique,Integer> res=new HashMap<Caracteristique,Integer>();
 	
 	protected StrategiePersonnage(LoggerProjet logger){
 		logger.info("Lanceur", "Creation de la console...");
@@ -108,6 +109,10 @@ public class StrategiePersonnage {
 				
 			} else { // si voisins, mais plus eloignes
 				// je vais vers le plus proche
+				console.setPhrase("Je lance Clairvoyance sur " + elemPlusProche);
+				System.out.println(res);
+				res = arene.lanceClairvoyance(refRMI, refCible);
+				
 				console.setPhrase("Je vais vers mon voisin " + elemPlusProche);
 				arene.deplace(refRMI, refCible);
 				arene.lanceAttaque(refRMI, refCible);
