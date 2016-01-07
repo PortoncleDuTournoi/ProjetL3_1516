@@ -24,11 +24,19 @@ public class StrategiePersonnage {
 	 */
 	protected Console console;
 	
-	// Contient le resultat de la clairvoyance
+	/**
+	 *  Contient le resultat de la clairvoyance
+	 */
 	protected HashMap<Caracteristique, Integer> statClair = new HashMap<Caracteristique, Integer>();
 	
+	/**
+	 * Reference du personnage sur lequel la clairvoyance a ete effectue
+	 */
 	int refClair;
 	
+	/**
+	 * Boolean pour savoir si le personnage doit attaquer ou non
+	 */
 	boolean attacAdv;
 	
 	protected StrategiePersonnage(LoggerProjet logger){
@@ -62,9 +70,7 @@ public class StrategiePersonnage {
 			e.printStackTrace();
 		}
 	}
-
-	// TODO etablir une strategie afin d'evoluer dans l'arene de combat
-	// une proposition de strategie (simple) est donnee ci-dessous
+	
 	/** 
 	 * Decrit la strategie.
 	 * Les methodes pour evoluer dans le jeu doivent etre les methodes RMI
@@ -98,23 +104,20 @@ public class StrategiePersonnage {
 		 ********************************/
 		/* Strategie 
 	 * 
-	 * attaque a distance
-	 * 
-	 * ALGO NON A JOUR
-	 * 
-	 * 
 	 *  si potion plus proche
-	 *  	si potion aporte bonus
-	 *  		aller vers elle
-	 *  		ramasser
+	 *  	si Aduril
+	 *  		si potion aporte bonus
+	 *  			aller vers elle
+	 *  			ramasser
+	 *  	si Diablo
+	 *  		si ennemi autour
 	 * 
 	 *  Sinon ennemi plus proche
 	 *  	clairvoyance
-	 *  	si peut se faire defoncer
+	 *  	si on peut tuer l'adverssaire
 	 *  		si potion teleportation en vision
 	 *  			aller vers potion de teleportation
-	 *  	
-	 *  
+	 *  	sinon fuir
 	 *  */
 		
 		
@@ -124,16 +127,15 @@ public class StrategiePersonnage {
 			// si ma vie <60 ,  heal
 			if(this.console.getPersonnage().getCaract(Caracteristique.VIE) < 60) 
 				arene.lanceAutoSoin(refRMI);
-			
 			// sinon j'erre
 			else{ 
 				console.setPhrase("J'erre...");
 				arene.deplace(refRMI, 0); 
 			}
 		} 
-		
 		/* Je vois des choses */
 		else {
+			/*Recherhce du plus proche voisins*/
 			int refCible = Calculs.chercheElementProche(position, voisins);
 			int distPlusProche = Calculs.distanceChebyshev(position, arene.getPosition(refCible));
 
@@ -169,7 +171,7 @@ public class StrategiePersonnage {
 							/* S'il y a un ennemi */
 							if(this.ennemiPlusProche(voisins, arene) != -1)
 							{
-								/* Intervention de Sylvain */
+								stratAttaque(refRMI,refCible,elemPlusProche,arene);
 							}
 							/* Sinon on erre, en priant pour rester pas loin de la potion */
 							else
@@ -179,9 +181,8 @@ public class StrategiePersonnage {
 							}
 						}
 					}
-					
 				/* Si l'element est un etre vivant */
-				} else {
+				}else {
 					// duel
 					console.setPhrase("Je fais un duel avec " + elemPlusProche);
 					arene.lanceAttaque(refRMI, refCible);
@@ -219,7 +220,7 @@ public class StrategiePersonnage {
 							/* S'il y a un ennemi */
 							if(this.ennemiPlusProche(voisins, arene) != -1)
 							{
-								/* Intervention de Sylvain */
+								stratAttaque(refRMI,refCible,elemPlusProche,arene);
 							}
 							/* Sinon on erre, en priant pour rester pas loin de la potion */
 							else
@@ -228,11 +229,9 @@ public class StrategiePersonnage {
 								arene.deplace(refRMI, 0);
 							}
 						}
-					}
-					
-					
-						
+					}	
 				}
+				/* Si l'element le plus proche est un monstre */
 				else if(arene.estMonstreFromRef(refCible)){
 					// si force > celle du monstre
 					if(this.console.getPersonnage().getCaract(Caracteristique.FORCE) >= 10){
@@ -244,96 +243,80 @@ public class StrategiePersonnage {
 						console.setPhrase("Je fuis comme un homosexuel...");
 						arene.deplace(refRMI, 0); 
 					}
-				}else{ // personnage
-					// clairvoyance
-					if(refCible != refClair){
-						statClair = arene.lanceClairvoyance(refRMI, refCible);
-						refClair = refCible;
-						attacAdv = this.gagnable(statClair);
-					}	
-					// si plus badass que nous, fuir
-					if(!attacAdv){
-						console.setPhrase("Je fuis comme un homosexuel...");
-						arene.deplace(refRMI, 0); 
-					}else{
-						console.setPhrase("Je vais vers mon voisin " + elemPlusProche);
-						arene.deplace(refRMI, refCible);
-						arene.lanceAttaque(refRMI, refCible);
-					}
+				}
+				/*Si l'element est un personnage */
+				else{ 
+					stratAttaque(refRMI,refCible,elemPlusProche,arene);
 				}
 			}
 		}
 	}
+	/*Strategie a appliquer contre un autre personnage*/
+	public void stratAttaque(int refRMI,int refCible,String elemPlusProche,IArene arene) throws RemoteException{
+		/*Si clairvoyance n'a pas deja ete utilise sur ce personnage*/
+		if(refCible != refClair){
+			statClair = arene.lanceClairvoyance(refRMI, refCible);
+			refClair = refCible;
+			attacAdv = this.gagnable(statClair);
+		}	
+		// si le personnage est plus "fort" on fuir
+		if(!attacAdv){
+			console.setPhrase("Je fuis ...");
+			arene.deplace(refRMI, 0); 
+		}
+		/*Si il a choisi d'attaquer l'autre personnage*/
+		else{
+			console.setPhrase("Je vais vers mon voisin " + elemPlusProche);
+			arene.deplace(refRMI, refCible);
+			arene.lanceAttaque(refRMI, refCible);
+		}
+	}
 	
+	/**
+	 * Fonction qui calcul si le personnage doit attaquer ou non
+	 */
 	public boolean gagnable(HashMap<Caracteristique, Integer> caractAdv) throws RemoteException{
 		boolean gagne = true;
 		boolean fin = false;
 		int t = 1;
+		/*Initialisation des degats*/
+		int nosDegats = this.console.getPersonnage().getCaract(Caracteristique.FORCE)-((this.console.getPersonnage().getCaract(Caracteristique.FORCE)*((caractAdv.get(Caracteristique.DEFENSE)-(10*t))/100))*t);
+		int sesDegats = caractAdv.get(Caracteristique.FORCE)-(caractAdv.get(Caracteristique.FORCE)*((this.console.getPersonnage().getCaract(Caracteristique.DEFENSE)-(10*t))/100)*t);
 		
+		/*Si les Cararteristique sont les memes on fuit*/
+		if((this.console.getPersonnage().getCaract(Caracteristique.FORCE) == caractAdv.get(Caracteristique.FORCE)) && (this.console.getPersonnage().getCaract(Caracteristique.VIE) == caractAdv.get(Caracteristique.VIE)) && (this.console.getPersonnage().getCaract(Caracteristique.INITIATIVE) == caractAdv.get(Caracteristique.INITIATIVE)) && (this.console.getPersonnage().getCaract(Caracteristique.DEFENSE) == caractAdv.get(Caracteristique.DEFENSE))){
+			gagne = false;
+			fin = true;
+		}
+		
+		/*Tant qu'un des deux personnages n'a pas tue l'autre*/
 		while(!fin){
-			if((this.console.getPersonnage().getCaract(Caracteristique.VIE) - (caractAdv.get(Caracteristique.FORCE)*t)) <= 0){
+			/*Si l'adverssaire peut nous tuer au tour t*/
+			if((this.console.getPersonnage().getCaract(Caracteristique.VIE) - sesDegats) <= 0){
+				/*Si l'adverssaire attaque en premier*/
 				if(this.console.getPersonnage().getCaract(Caracteristique.INITIATIVE) < caractAdv.get(Caracteristique.INITIATIVE)){
 					gagne = false;
 					fin = true;
-				}else if((caractAdv.get(Caracteristique.VIE) - (this.console.getPersonnage().getCaract(Caracteristique.FORCE)*t)) <= 0){
+				}
+				/*Si on peut tuer l'adverssaire au tour t*/
+				else if((caractAdv.get(Caracteristique.VIE) - nosDegats) <= 0){
 					fin = true;
 				}else{
 					gagne = false;
 					fin = true;
 				}
-			}else if((caractAdv.get(Caracteristique.VIE) - (this.console.getPersonnage().getCaract(Caracteristique.FORCE)*t)) <= 0){
+			/*Si on peut tuer l'adverssaire au tour t*/
+			}else if((caractAdv.get(Caracteristique.VIE) - sesDegats) <= 0){
 				fin = true;
 			}
 			t++;
+			/*Calcul des degats pour un tour de plus*/
+			nosDegats = this.console.getPersonnage().getCaract(Caracteristique.FORCE)-((this.console.getPersonnage().getCaract(Caracteristique.FORCE)*((caractAdv.get(Caracteristique.DEFENSE)-(10*t))/100))*t);
+			sesDegats = caractAdv.get(Caracteristique.FORCE)-(caractAdv.get(Caracteristique.FORCE)*((this.console.getPersonnage().getCaract(Caracteristique.DEFENSE)-(10*t))/100)*t);
 		}
 		
 		return gagne;
 	}
-	
-	/********************************************
-	 * 											*
-	 *	 LISTE DES DIFFERENTES STRATEGIES		*
-	 *											*
-	 *  copier coller la strategie desiree		*
-	 *  en dessous de "strategie du personnage"	*
-	 *  	dans executeStrategie()				*
-	 * 											*
-	 ********************************************/
-	
-	
-	/* Strategie de base
-	  else {
-			int refCible = Calculs.chercheElementProche(position, voisins);
-			int distPlusProche = Calculs.distanceChebyshev(position, arene.getPosition(refCible));
-
-			String elemPlusProche = arene.nomFromRef(refCible);
-
-			if(distPlusProche <= Constantes.DISTANCE_MIN_INTERACTION) { // si suffisamment proches
-				// j'interagis directement
-				if(arene.estPotionFromRef(refCible)){ // potion
-					// ramassage
-					console.setPhrase("Je ramasse une potion");
-
-					arene.ramassePotion(refRMI, refCible);			
-				} else { // personnage
-					// duel
-					console.setPhrase("Je fais un duel avec " + elemPlusProche);
-					arene.lanceAttaque(refRMI, refCible);
-					arene.deplace(refRMI, refCible);
-				}
-				
-			} else { // si voisins, mais plus eloignes
-				// je vais vers le plus proche
-				console.setPhrase("Je lance Clairvoyance sur " + elemPlusProche);
-				System.out.println(res);
-				res = arene.lanceClairvoyance(refRMI, refCible);
-				
-				console.setPhrase("Je vais vers mon voisin " + elemPlusProche);
-				arene.deplace(refRMI, refCible);
-				arene.lanceAttaque(refRMI, refCible);
-			}
-		}
-	 */
 	
 	/* Verifie la legitimite de la prise d'une potion Anduril */
 	public boolean goodPotion(IArene arene, int refCible) throws RemoteException {
