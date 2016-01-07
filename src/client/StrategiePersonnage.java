@@ -23,7 +23,6 @@ public class StrategiePersonnage {
 	 * (l'arene).
 	 */
 	protected Console console;
-	protected HashMap<Caracteristique,Integer> res=new HashMap<Caracteristique,Integer>();
 	
 	// Contient le resultat de la clairvoyance
 	protected HashMap<Caracteristique, Integer> statClair = new HashMap<Caracteristique, Integer>();
@@ -97,6 +96,8 @@ public class StrategiePersonnage {
 		 ********************************/
 		/* Strategie 
 	 * 
+	 * attaque a distance
+	 * 
 	 * ALGO NON A JOUR
 	 * 
 	 * 
@@ -115,7 +116,8 @@ public class StrategiePersonnage {
 	 *  */
 		if (voisins.isEmpty()) { // je n'ai pas de voisins, j'erre
 			// si ma vie <60 ,  heal
-			if(this.console.getPersonnage().getCaract(Caracteristique.VIE) < 60) arene.lanceAutoSoin(refRMI);
+			if(this.console.getPersonnage().getCaract(Caracteristique.VIE) < 60) 
+				arene.lanceAutoSoin(refRMI);
 			
 			// sinon j'erre
 			else{ 
@@ -135,9 +137,21 @@ public class StrategiePersonnage {
 				if(arene.estPotionFromRef(refCible)){ // potion
 					// ramassage si �a vaut le coup
 					// si tp : ramassage que si dans la merde
-					
-					console.setPhrase("Je ramasse une potion");
-					arene.ramassePotion(refRMI, refCible);			
+
+					// Anduril
+					if(elemPlusProche.equals("Anduril")){
+						 // regarder si �a vaut le coup d'aller la prendre
+						if(goodPotion(arene, refCible)){
+							console.setPhrase("Je ramasse une potion");
+							arene.ramassePotion(refRMI, refCible);
+						}
+						// sinon errer
+						else{
+							console.setPhrase("J'erre...");
+							arene.deplace(refRMI, 0);
+						}
+					}
+					// Diablo														
 				} else { // personnage ou monstre
 					// duel
 					console.setPhrase("Je fais un duel avec " + elemPlusProche);
@@ -150,14 +164,30 @@ public class StrategiePersonnage {
 				if(arene.estPotionFromRef(refCible)){ // Potion a distance
 					// Anduril : regarder si �a vaut le coup d'aller la prendre
 					// Diablo Potion :
+					// Anduril
+					if(elemPlusProche.equals("Anduril")){
+						 // Si la potion est une bonne potion, la prendre
+						if(goodPotion(arene, refCible)){
+							console.setPhrase("Je ramasse une potion");
+							arene.ramassePotion(refRMI, refCible);
+						}
+						// sinon errer
+						else{
+							console.setPhrase("J'erre...");
+							arene.deplace(refRMI, 0);
+						}
+					}
+					// Diablo
+					else{
 						// si ennemi dans champ vision
 							// clairvoyance
 							// si on va se faire defoncer
 								// aller vers potion
 							// sinon
 								// aller vers personnage
-				}
-				else if(arene.estMonstreFromRef(refCible)){
+						// sinon errer
+					}	
+				}else if(arene.estMonstreFromRef(refCible)){
 					// si force > celle du monstre
 					if(this.console.getPersonnage().getCaract(Caracteristique.FORCE) >= 10){
 						console.setPhrase("Je vais vers mon voisin " + elemPlusProche);
@@ -168,9 +198,7 @@ public class StrategiePersonnage {
 						console.setPhrase("Je fuis comme un homosexuel...");
 						arene.deplace(refRMI, 0); 
 					}
-				}
-				
-				else{ // personnage
+				}else{ // personnage
 					// clairvoyance
 					if(refCible != refClair){
 						statClair = arene.lanceClairvoyance(refRMI, refCible);
@@ -260,4 +288,32 @@ public class StrategiePersonnage {
 		}
 	 */
 	
+	/* Verifie la legitimite de la prise d'une potion Anduril */
+	public boolean goodPotion(IArene arene, int refCible) throws RemoteException {
+		boolean nonAbsolu = false;
+		int fav = 0;
+		
+		if(arene.caractFromRef(refCible, Caracteristique.DEFENSE) + this.console.getPersonnage().getCaract(Caracteristique.DEFENSE) > 0){
+			if(arene.caractFromRef(refCible, Caracteristique.DEFENSE) >= 0) fav++; 
+		}else nonAbsolu = true;
+		
+		if(arene.caractFromRef(refCible, Caracteristique.FORCE) + this.console.getPersonnage().getCaract(Caracteristique.FORCE) > 0 && nonAbsolu == false){
+			if(arene.caractFromRef(refCible, Caracteristique.FORCE) >= 0) fav++; 
+		}else nonAbsolu = true;
+		
+		if(arene.caractFromRef(refCible, Caracteristique.VIE) + this.console.getPersonnage().getCaract(Caracteristique.VIE) > 0 && nonAbsolu == false){
+			if(arene.caractFromRef(refCible, Caracteristique.VIE) >= 0) fav++; 
+		}else nonAbsolu = true;
+
+		if(arene.caractFromRef(refCible, Caracteristique.INITIATIVE) + this.console.getPersonnage().getCaract(Caracteristique.INITIATIVE) > 0 && nonAbsolu == false){
+			if(arene.caractFromRef(refCible, Caracteristique.INITIATIVE) >= 0) fav++; 
+		}else nonAbsolu = true;
+		
+		
+		if(nonAbsolu == true || fav < 2) return false;
+		else return true;
+	}
+	
 }
+
+
