@@ -145,10 +145,10 @@ public class StrategiePersonnage {
 				if(arene.estPotionFromRef(refCible)){ 
 					// Anduril
 					if(elemPlusProche.equals("Anduril")){
-						 // regarder si �a vaut le coup d'aller la prendre
+						 // regarder si ca vaut le coup d'aller la prendre
 						if(goodPotion(arene, refCible)){
-							console.setPhrase("Je vais vers une potion");
-							arene.deplace(refRMI, refCible);
+							console.setPhrase("Je ramasse une potion");
+							arene.ramassePotion(refRMI, refCible);
 						}
 						// sinon errer
 						else{
@@ -161,8 +161,8 @@ public class StrategiePersonnage {
 						/* Si plus d'un ennemi est a proximite */
 						if(this.nbEnnemis(voisins, arene) > 1)
 						{
-							console.setPhrase("Je vais vers une potion");
-							arene.deplace(refRMI, refCible);
+							console.setPhrase("Je ramasse une potion");
+							arene.ramassePotion(refRMI, refCible);
 						}
 						else
 						{
