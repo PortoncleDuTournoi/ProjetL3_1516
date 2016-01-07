@@ -28,6 +28,8 @@ public class StrategiePersonnage {
 	// Contient le resultat de la clairvoyance
 	protected HashMap<Caracteristique, Integer> statClair = new HashMap<Caracteristique, Integer>();
 	
+	int refClair;
+	
 	protected StrategiePersonnage(LoggerProjet logger){
 		logger.info("Lanceur", "Creation de la console...");
 	}
@@ -131,7 +133,7 @@ public class StrategiePersonnage {
 			if(distPlusProche <= Constantes.DISTANCE_MIN_INTERACTION) { // si suffisamment proches
 				
 				if(arene.estPotionFromRef(refCible)){ // potion
-					// ramassage si ça vaut le coup
+					// ramassage si ï¿½a vaut le coup
 					// si tp : ramassage que si dans la merde
 					
 					console.setPhrase("Je ramasse une potion");
@@ -146,7 +148,7 @@ public class StrategiePersonnage {
 			} else { // si voisins, mais plus eloignes
 				
 				if(arene.estPotionFromRef(refCible)){ // Potion a distance
-					// Anduril : regarder si ça vaut le coup d'aller la prendre
+					// Anduril : regarder si ï¿½a vaut le coup d'aller la prendre
 					// Diablo Potion :
 						// si ennemi dans champ vision
 							// clairvoyance
@@ -170,22 +172,47 @@ public class StrategiePersonnage {
 				
 				else{ // personnage
 					// clairvoyance
-					
-					
+					if(refCible != refClair){
+						statClair = arene.lanceClairvoyance(refRMI, refCible);
+						refClair = refCible;
+					}	
 					// si plus badass que nous, fuir
-					/*if(1){
+					if(!this.gagnable(statClair)){
 						console.setPhrase("Je fuis comme un homosexuel...");
 						arene.deplace(refRMI, 0); 
-					}*/
-					
-					/*else{*/
+					}else{
 						console.setPhrase("Je vais vers mon voisin " + elemPlusProche);
 						arene.deplace(refRMI, refCible);
 						arene.lanceAttaque(refRMI, refCible);
-					//}
+					}
 				}
 			}
 		}
+	}
+	
+	public boolean gagnable(HashMap<Caracteristique, Integer> caractAdv) throws RemoteException{
+		boolean gagne = true;
+		boolean fin = false;
+		int t = 1;
+		
+		while(!fin){
+			if((this.console.getPersonnage().getCaract(Caracteristique.VIE) - (caractAdv.get(Caracteristique.FORCE)*t)) <= 0){
+				if(this.console.getPersonnage().getCaract(Caracteristique.INITIATIVE)< caractAdv.get(Caracteristique.INITIATIVE)){
+					gagne = false;
+					fin = true;
+				}else if((caractAdv.get(Caracteristique.VIE) - (this.console.getPersonnage().getCaract(Caracteristique.FORCE)*t)) <= 0){
+					fin = true;
+				}else{
+					gagne = false;
+					fin = true;
+				}
+			}else if((caractAdv.get(Caracteristique.VIE) - (this.console.getPersonnage().getCaract(Caracteristique.FORCE)*t)) <= 0){
+				fin = true;
+			}
+			t++;
+		}
+		
+		return gagne;
 	}
 	
 	/********************************************
