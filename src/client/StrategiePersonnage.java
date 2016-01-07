@@ -82,6 +82,16 @@ public class StrategiePersonnage {
 			e.printStackTrace();
 		}
 		
+		
+		
+		
+		
+		/********************************
+		 * 	 							*
+		 *   STRATEGIE DU PERSONNAGE	*
+		 *   							*
+		 ********************************/
+		
 		if (voisins.isEmpty()) { // je n'ai pas de voisins, j'erre
 			console.setPhrase("J'erre...");
 			arene.deplace(refRMI, 0); 
