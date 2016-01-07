@@ -125,5 +125,48 @@ public class StrategiePersonnage {
 		}
 	}
 
+	/********************************************
+	 * 											*
+	 *	 LISTE DES DIFFERENTES STRATEGIES		*
+	 *											*
+	 *  copier coller la strategie desiree		*
+	 *  en dessous de "strategie du personnage"	*
+	 *  	dans executeStrategie()				*
+	 * 											*
+	 ********************************************/
+	
+	/* Strategie de base
+	   if (voisins.isEmpty()) { // je n'ai pas de voisins, j'erre
+			console.setPhrase("J'erre...");
+			arene.deplace(refRMI, 0); 
+			
+		} else {
+			int refCible = Calculs.chercheElementProche(position, voisins);
+			int distPlusProche = Calculs.distanceChebyshev(position, arene.getPosition(refCible));
+
+			String elemPlusProche = arene.nomFromRef(refCible);
+
+			if(distPlusProche <= Constantes.DISTANCE_MIN_INTERACTION) { // si suffisamment proches
+				// j'interagis directement
+				if(arene.estPotionFromRef(refCible)){ // potion
+					// ramassage
+					console.setPhrase("Je ramasse une potion");
+
+					arene.ramassePotion(refRMI, refCible);			
+				} else { // personnage
+					// duel
+					console.setPhrase("Je fais un duel avec " + elemPlusProche);
+					arene.lanceAttaque(refRMI, refCible);
+					arene.deplace(refRMI, refCible);
+				}
+				
+			} else { // si voisins, mais plus eloignes
+				// je vais vers le plus proche
+				console.setPhrase("Je vais vers mon voisin " + elemPlusProche);
+				arene.deplace(refRMI, refCible);
+				arene.lanceAttaque(refRMI, refCible);
+			}
+		}
+	 */
 	
 }
