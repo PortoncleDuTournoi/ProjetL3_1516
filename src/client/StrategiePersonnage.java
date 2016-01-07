@@ -94,6 +94,8 @@ public class StrategiePersonnage {
 		 ********************************/
 		/* Strategie 
 	 * 
+	 * attaque a distance
+	 * 
 	 * ALGO NON A JOUR
 	 * 
 	 * 
@@ -112,7 +114,8 @@ public class StrategiePersonnage {
 	 *  */
 		if (voisins.isEmpty()) { // je n'ai pas de voisins, j'erre
 			// si ma vie <60 ,  heal
-			if(this.console.getPersonnage().getCaract(Caracteristique.VIE) < 60) arene.lanceAutoSoin(refRMI);
+			if(this.console.getPersonnage().getCaract(Caracteristique.VIE) < 60) 
+				arene.lanceAutoSoin(refRMI);
 			
 			// sinon j'erre
 			else{ 
@@ -130,11 +133,23 @@ public class StrategiePersonnage {
 			if(distPlusProche <= Constantes.DISTANCE_MIN_INTERACTION) { // si suffisamment proches
 				
 				if(arene.estPotionFromRef(refCible)){ // potion
-					// ramassage si ça vaut le coup
-					// si tp : ramassage que si dans la merde
+					// Anduril
+					if(elemPlusProche.equals("Anduril")){
+						 // regarder si ça vaut le coup d'aller la prendre
+						if(goodPotion(arene, refCible)){
+							console.setPhrase("Je ramasse une potion");
+							arene.ramassePotion(refRMI, refCible);
+						}
+						// sinon errer
+						else{
+							console.setPhrase("J'erre...");
+							arene.deplace(refRMI, 0);
+						}
+					}
+					// Diablo
 					
-					console.setPhrase("Je ramasse une potion");
-					arene.ramassePotion(refRMI, refCible);			
+					
+					
 				} else { // personnage ou monstre
 					// duel
 					console.setPhrase("Je fais un duel avec " + elemPlusProche);
@@ -145,14 +160,32 @@ public class StrategiePersonnage {
 			} else { // si voisins, mais plus eloignes
 				
 				if(arene.estPotionFromRef(refCible)){ // Potion a distance
-					// Anduril : regarder si ça vaut le coup d'aller la prendre
-					// Diablo Potion :
+					// Anduril
+					if(elemPlusProche.equals("Anduril")){
+						 // Si la potion est une bonne potion, la prendre
+						if(goodPotion(arene, refCible)){
+							console.setPhrase("Je ramasse une potion");
+							arene.ramassePotion(refRMI, refCible);
+						}
+						// sinon errer
+						else{
+							console.setPhrase("J'erre...");
+							arene.deplace(refRMI, 0);
+						}
+					}
+					// Diablo
+					else{ 
 						// si ennemi dans champ vision
 							// clairvoyance
 							// si on va se faire defoncer
 								// aller vers potion
 							// sinon
 								// aller vers personnage
+						// sinon errer
+					}
+					
+					
+						
 				}
 				else if(arene.estMonstreFromRef(refCible)){
 					// si force > celle du monstre
@@ -228,4 +261,32 @@ public class StrategiePersonnage {
 		}
 	 */
 	
+	/* Verifie la legitimite de la prise d'une potion Anduril */
+	public boolean goodPotion(IArene arene, int refCible) throws RemoteException {
+		boolean nonAbsolu = false;
+		int fav = 0;
+		
+		if(arene.caractFromRef(refCible, Caracteristique.DEFENSE) + this.console.getPersonnage().getCaract(Caracteristique.DEFENSE) > 0){
+			if(arene.caractFromRef(refCible, Caracteristique.DEFENSE) >= 0) fav++; 
+		}else nonAbsolu = true;
+		
+		if(arene.caractFromRef(refCible, Caracteristique.FORCE) + this.console.getPersonnage().getCaract(Caracteristique.FORCE) > 0 && nonAbsolu == false){
+			if(arene.caractFromRef(refCible, Caracteristique.FORCE) >= 0) fav++; 
+		}else nonAbsolu = true;
+		
+		if(arene.caractFromRef(refCible, Caracteristique.VIE) + this.console.getPersonnage().getCaract(Caracteristique.VIE) > 0 && nonAbsolu == false){
+			if(arene.caractFromRef(refCible, Caracteristique.VIE) >= 0) fav++; 
+		}else nonAbsolu = true;
+
+		if(arene.caractFromRef(refCible, Caracteristique.INITIATIVE) + this.console.getPersonnage().getCaract(Caracteristique.INITIATIVE) > 0 && nonAbsolu == false){
+			if(arene.caractFromRef(refCible, Caracteristique.INITIATIVE) >= 0) fav++; 
+		}else nonAbsolu = true;
+		
+		
+		if(nonAbsolu == true || fav < 2) return false;
+		else return true;
+	}
+	
 }
+
+
