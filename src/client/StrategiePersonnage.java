@@ -135,10 +135,10 @@ public class StrategiePersonnage {
 
 			String elemPlusProche = arene.nomFromRef(refCible);
 			
-			/* Si une élément est suffisamment proche */
+			/* Si une element est suffisamment proche */
 			if(distPlusProche <= Constantes.DISTANCE_MIN_INTERACTION) { 
 				
-				/* Si l'élément est une POTION */
+				/* Si l'element est une POTION */
 				if(arene.estPotionFromRef(refCible)){ 
 					// Anduril
 					if(elemPlusProche.equals("Anduril")){
@@ -154,9 +154,30 @@ public class StrategiePersonnage {
 						}
 					}
 					// Diablo
+					else{
+						/* Si plus d'un ennemi est a proximite */
+						if(this.nbEnnemis(voisins, arene) > 1)
+						{
+							console.setPhrase("Je vais vers une potion");
+							arene.deplace(refRMI, refCible);
+						}
+						else
+						{
+							/* S'il y a un ennemi */
+							if(this.ennemiPlusProche(voisins, arene) != -1)
+							{
+								/* Intervention de Sylvain */
+							}
+							/* Sinon on erre, en priant pour rester pas loin de la potion */
+							else
+							{
+								console.setPhrase("J'erre...");
+								arene.deplace(refRMI, 0);
+							}
+						}
+					}
 					
-					
-				/* Si l'élément est un être vivant */
+				/* Si l'element est un etre vivant */
 				} else {
 					// duel
 					console.setPhrase("Je fais un duel avec " + elemPlusProche);
@@ -164,15 +185,15 @@ public class StrategiePersonnage {
 					arene.deplace(refRMI, refCible);
 				}
 				
-			/* Si l'élément est trop éloigné */
+			/* Si l'element est trop eloigne */
 			} else { 
 				
-				/* L'élément est une POTION */
+				/* L'element est une POTION */
 				if(arene.estPotionFromRef(refCible)){
 					
 					/* ANDURIL */
 					if(elemPlusProche.equals("Anduril")){
-						 /* Si bonne potion, déplacer */
+						 /* Si bonne potion, deplacer */
 						if(goodPotion(arene, refCible)){
 							console.setPhrase("Je vais vers une potion");
 							arene.deplace(refRMI, refCible);
@@ -186,7 +207,7 @@ public class StrategiePersonnage {
 					
 					/* DIABLO */
 					else{
-						/* Si plus d'un ennemi est a proximité */
+						/* Si plus d'un ennemi est a proximite */
 						if(this.nbEnnemis(voisins, arene) > 1)
 						{
 							console.setPhrase("Je vais vers une potion");
