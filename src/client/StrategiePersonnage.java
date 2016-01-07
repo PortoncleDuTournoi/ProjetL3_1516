@@ -145,7 +145,7 @@ public class StrategiePersonnage {
 				if(arene.estPotionFromRef(refCible)){ 
 					// Anduril
 					if(elemPlusProche.equals("Anduril")){
-						 // regarder si ca vaut le coup d'aller la prendre
+						 // regarder si �a vaut le coup d'aller la prendre
 						if(goodPotion(arene, refCible)){
 							console.setPhrase("Je ramasse une potion");
 							arene.ramassePotion(refRMI, refCible);
@@ -275,21 +275,14 @@ public class StrategiePersonnage {
 				if(this.console.getPersonnage().getCaract(Caracteristique.INITIATIVE) < caractAdv.get(Caracteristique.INITIATIVE)){
 					gagne = false;
 					fin = true;
-					System.out.println(caractAdv);
-					System.out.println(console.getPersonnage());
-					System.out.println();
-					System.out.println("Il tape en premeier et nous tue!");
 				}else if((caractAdv.get(Caracteristique.VIE) - (this.console.getPersonnage().getCaract(Caracteristique.FORCE)*t)) <= 0){
 					fin = true;
-					System.out.println("Il peut nous tuer mais on le tue avant!");
 				}else{
 					gagne = false;
 					fin = true;
-					System.out.println("On tape en premier mais il nous defonce apres");
 				}
 			}else if((caractAdv.get(Caracteristique.VIE) - (this.console.getPersonnage().getCaract(Caracteristique.FORCE)*t)) <= 0){
 				fin = true;
-				System.out.println("On le defonce");
 			}
 			t++;
 		}
