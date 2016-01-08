@@ -240,7 +240,7 @@ public class StrategiePersonnage {
 						arene.lanceAttaque(refRMI, refCible);
 					}
 					else{
-						console.setPhrase("Je fuis comme un homosexuel...");
+						console.setPhrase("Je fuis...");
 						arene.deplace(refRMI, 0); 
 					}
 				}
@@ -253,16 +253,17 @@ public class StrategiePersonnage {
 	}
 	/*Strategie a appliquer contre un autre personnage*/
 	public void stratAttaque(int refRMI,int refCible,String elemPlusProche,IArene arene) throws RemoteException{
+		
 		/*Si clairvoyance n'a pas deja ete utilise sur ce personnage*/
 		if(refCible != refClair){
 			statClair = arene.lanceClairvoyance(refRMI, refCible);
 			refClair = refCible;
 			attacAdv = this.gagnable(statClair);
 		}	
-		// si le personnage est plus "fort" on fuir
+		// si le personnage est plus "fort" on fuit
 		if(!attacAdv){
 			console.setPhrase("Je fuis ...");
-			arene.deplace(refRMI, 0); 
+			arene.deplace(refRMI,0); 
 		}
 		/*Si il a choisi d'attaquer l'autre personnage*/
 		else{
@@ -287,6 +288,7 @@ public class StrategiePersonnage {
 		if((this.console.getPersonnage().getCaract(Caracteristique.FORCE) == caractAdv.get(Caracteristique.FORCE)) && (this.console.getPersonnage().getCaract(Caracteristique.VIE) == caractAdv.get(Caracteristique.VIE)) && (this.console.getPersonnage().getCaract(Caracteristique.INITIATIVE) == caractAdv.get(Caracteristique.INITIATIVE)) && (this.console.getPersonnage().getCaract(Caracteristique.DEFENSE) == caractAdv.get(Caracteristique.DEFENSE))){
 			gagne = false;
 			fin = true;
+			System.out.println("Yo");
 		}
 		
 		/*Tant qu'un des deux personnages n'a pas tue l'autre*/
