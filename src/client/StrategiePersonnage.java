@@ -171,6 +171,15 @@ public class StrategiePersonnage {
 							/* S'il y a un ennemi */
 							if(this.ennemiPlusProche(voisins, arene) != -1)
 							{
+								// prendre la reference de l'ennermi plutot que de la potion dans refCible
+								for(Integer refVoisin : voisins.keySet())
+								{
+									if(arene.estPersonnageFromRef(refVoisin))
+									{
+										refCible = refVoisin;
+									}
+								}
+								
 								stratAttaque(refRMI,refCible,elemPlusProche,arene);
 							}
 							/* Sinon on erre, en priant pour rester pas loin de la potion */
@@ -220,6 +229,15 @@ public class StrategiePersonnage {
 							/* S'il y a un ennemi */
 							if(this.ennemiPlusProche(voisins, arene) != -1)
 							{
+								// prendre la reference de l'ennermi plutot que de la potion dans refCible
+								for(Integer refVoisin : voisins.keySet())
+								{
+									if(arene.estPersonnageFromRef(refVoisin))
+									{
+										refCible = refVoisin;
+									}
+								}
+								
 								stratAttaque(refRMI,refCible,elemPlusProche,arene);
 							}
 							/* Sinon on erre, en priant pour rester pas loin de la potion */
