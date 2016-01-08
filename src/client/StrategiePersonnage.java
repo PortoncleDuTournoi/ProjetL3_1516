@@ -125,7 +125,7 @@ public class StrategiePersonnage {
 		/* Je n'ai pas de voisin, j'erre */
 		if (voisins.isEmpty()) { 
 			// si ma vie <60 ,  heal
-			if(this.console.getPersonnage().getCaract(Caracteristique.VIE) < 60) 
+			if(this.console.getPersonnage().getCaract(Caracteristique.VIE) < 100) 
 				arene.lanceAutoSoin(refRMI);
 			// sinon j'erre
 			else{ 
@@ -154,8 +154,13 @@ public class StrategiePersonnage {
 						}
 						// sinon errer
 						else{
-							console.setPhrase("J'erre...");
-							arene.deplace(refRMI, 0);
+							if(this.console.getPersonnage().getCaract(Caracteristique.VIE) < 100) 
+								arene.lanceAutoSoin(refRMI);
+							
+							else{
+								console.setPhrase("J'erre...");
+								arene.deplace(refRMI, 0);
+							}
 						}
 					}
 					// Diablo
@@ -185,8 +190,12 @@ public class StrategiePersonnage {
 							/* Sinon on erre, en priant pour rester pas loin de la potion */
 							else
 							{
-								console.setPhrase("J'erre...");
-								arene.deplace(refRMI, 0);
+								if(this.console.getPersonnage().getCaract(Caracteristique.VIE) < 100) 
+									arene.lanceAutoSoin(refRMI);
+								else{
+									console.setPhrase("J'erre...");
+									arene.deplace(refRMI, 0);
+								}
 							}
 						}
 					}
@@ -212,8 +221,13 @@ public class StrategiePersonnage {
 						}
 						/* Errer sinon */
 						else{
-							console.setPhrase("J'erre...");
-							arene.deplace(refRMI, 0);
+							if(this.console.getPersonnage().getCaract(Caracteristique.VIE) < 100) 
+								arene.lanceAutoSoin(refRMI);
+							
+							else{
+								console.setPhrase("J'erre...");
+								arene.deplace(refRMI, 0);
+							}
 						}
 					}					
 					/* DIABLO */
@@ -243,8 +257,12 @@ public class StrategiePersonnage {
 							/* Sinon on erre, en priant pour rester pas loin de la potion */
 							else
 							{
-								console.setPhrase("J'erre...");
-								arene.deplace(refRMI, 0);
+								if(this.console.getPersonnage().getCaract(Caracteristique.VIE) < 100) 
+									arene.lanceAutoSoin(refRMI);
+								else{
+									console.setPhrase("J'erre...");
+									arene.deplace(refRMI, 0);
+								}
 							}
 						}
 					}	
@@ -258,8 +276,12 @@ public class StrategiePersonnage {
 						arene.lanceAttaque(refRMI, refCible);
 					}
 					else{
-						console.setPhrase("Je fuis...");
-						arene.deplace(refRMI, 0); 
+						if(this.console.getPersonnage().getCaract(Caracteristique.VIE) < 100) 
+							arene.lanceAutoSoin(refRMI);
+						else{
+							console.setPhrase("Je fuis...");
+							arene.deplace(refRMI, 0); 
+						}
 					}
 				}
 				/*Si l'element est un personnage */
@@ -280,8 +302,12 @@ public class StrategiePersonnage {
 		}	
 		// si le personnage est plus "fort" on fuit
 		if(!attacAdv){
-			console.setPhrase("Je fuis ...");
-			arene.deplace(refRMI,0); 
+			if(this.console.getPersonnage().getCaract(Caracteristique.VIE) < 100) 
+				arene.lanceAutoSoin(refRMI);
+			else{
+				console.setPhrase("Je fuis...");
+				arene.deplace(refRMI, 0); 
+			}
 		}
 		/*Si il a choisi d'attaquer l'autre personnage*/
 		else{
