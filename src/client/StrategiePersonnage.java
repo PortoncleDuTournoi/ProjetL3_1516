@@ -303,7 +303,14 @@ public class StrategiePersonnage {
 		int sesDegats = caractAdv.get(Caracteristique.FORCE)-(caractAdv.get(Caracteristique.FORCE)*((this.console.getPersonnage().getCaract(Caracteristique.DEFENSE)-(10*t))/100)*t);
 		
 		/*Si les Cararteristique sont les memes on fuit*/
-		if((this.console.getPersonnage().getCaract(Caracteristique.FORCE) == caractAdv.get(Caracteristique.FORCE)) && (this.console.getPersonnage().getCaract(Caracteristique.VIE) == caractAdv.get(Caracteristique.VIE)) && (this.console.getPersonnage().getCaract(Caracteristique.INITIATIVE) == caractAdv.get(Caracteristique.INITIATIVE)) && (this.console.getPersonnage().getCaract(Caracteristique.DEFENSE) == caractAdv.get(Caracteristique.DEFENSE))){
+		if((this.console.getPersonnage().getCaract(Caracteristique.FORCE).equals(caractAdv.get(Caracteristique.FORCE))) 
+			&& 
+			(this.console.getPersonnage().getCaract(Caracteristique.VIE).equals(caractAdv.get(Caracteristique.VIE))) 
+			&& 
+			(this.console.getPersonnage().getCaract(Caracteristique.INITIATIVE).equals(caractAdv.get(Caracteristique.INITIATIVE))) 
+			&& 
+			(this.console.getPersonnage().getCaract(Caracteristique.DEFENSE).equals(caractAdv.get(Caracteristique.DEFENSE))))
+		{
 			gagne = false;
 			fin = true;
 			System.out.println("Yo");
